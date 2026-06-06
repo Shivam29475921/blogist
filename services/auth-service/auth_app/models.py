@@ -34,3 +34,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELD = ['username']
     def __str__(self):
         return self.email
+    
+
+class Follow(models.Model):
+    follower_id = models.IntegerField()
+    follower_username = models.CharField(max_length=50)
+    following_id = models.IntegerField()
+    following_username = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['follower_id', 'following_id']
+
+    def __str__(self):
+        return f'{self.follower_username} follows {self.following_username}'
