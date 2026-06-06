@@ -20,11 +20,17 @@ export const authAPI ={
 
 //post services
 export const postAPI = {
-    getPosts: ()=> axios.get(`${POST_URL}/api/posts/`),
+    getPosts: () => axios.get(`${POST_URL}/api/posts/`),
     getPost: (id) => axios.get(`${POST_URL}/api/posts/${id}/`),
-    createPost: (data) => axios.post(`${POST_URL}/api/posts/create/`, data, { headers: getAuthHeader() }),
-    deletePost: (id) => axios.delete(`${POST_URL}/api/posts/${id}/`, { headers: getAuthHeader() })
-
+    createPost: (data) => axios.post(`${POST_URL}/api/posts/create/`, data, {
+        headers: getAuthHeaders()
+    }),
+    deletePost: (id) => axios.delete(`${POST_URL}/api/posts/${id}/`, {
+        headers: getAuthHeaders()
+    }),
+    toggleLike: (id) => axios.post(`${POST_URL}/api/posts/${id}/like/`, {}, {
+        headers: getAuthHeaders()
+    }),
 }
 
 //comment service

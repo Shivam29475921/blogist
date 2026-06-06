@@ -1,24 +1,24 @@
+import os
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from .models import Post
+from .models import Post, Like
 from .serializers import PostSerializer
-import os
-print("SECRET_KEY LOADED:", os.getenv('SECRET_KEY'))
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_posts(request):
     posts = Post.objects.all()
-    serializer = PostSerializer(posts, many=True)
+    serializer = PostSerializer(posts, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_post(request):
-    serializer = PostSerializer(data=request.data)
+    serializer = PostSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         serializer.save(
             author_id=request.user.id,
@@ -39,7 +39,7 @@ def post_detail(request, pk):
         )
 
     if request.method == 'GET':
-        serializer = PostSerializer(post)
+        serializer = PostSerializer(post, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     if request.method == 'DELETE':
@@ -53,3 +53,34 @@ def post_detail(request, pk):
             {'message': 'Post deleted successfully'},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_like(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response(
+            {'error': 'Post not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    like, created = Like.objects.get_or_create(
+        post=post,
+        user_id=request.user.id
+    )
+
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        liked = True
+
+    return Response(
+        {
+            'liked': liked,
+            'likes_count': post.likes.count()
+        },
+        status=status.HTTP_200_OK
+    )

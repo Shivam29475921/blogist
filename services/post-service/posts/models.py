@@ -14,3 +14,15 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class Like(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    user_id = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['post', 'user_id']
+
+    def __str__(self):
+        return f'Like by user {self.user_id} on post {self.post_id}'
