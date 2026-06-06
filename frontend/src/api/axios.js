@@ -5,7 +5,7 @@ const COMMENT_URL='http://localhost:8003'
 const AI_URL= 'http://localhost:8004'
 
 const getAuthHeader =()=> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     return token ? {
         Authorization: `Bearer ${token}`
     } : {}
@@ -22,7 +22,7 @@ export const authAPI ={
 export const postAPI = {
     getPosts: ()=> axios.get(`${POST_URL}/api/posts/`),
     getPost: (id) => axios.get(`${POST_URL}/api/posts/${id}/`),
-    createPost: (data) => axios.post(`${POST_URL}/api/posts/`, data, { headers: getAuthHeader() }),
+    createPost: (data) => axios.post(`${POST_URL}/api/posts/create/`, data, { headers: getAuthHeader() }),
     deletePost: (id) => axios.delete(`${POST_URL}/api/posts/${id}/`, { headers: getAuthHeader() })
 
 }
@@ -34,5 +34,5 @@ export const commentAPI={
 }
 //AI Service
 export const aiAPI={
-    generateBlog: (topic)=> axios.post(`${AI_URL}/api/ai/generate/`, { topic }, { headers: getAuthHeader() })
+    generateBlog: (topic)=> axios.post(`${AI_URL}/api/ai/generate-blog/`, { topic }, { headers: getAuthHeader() })
 }

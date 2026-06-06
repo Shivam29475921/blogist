@@ -24,7 +24,15 @@ def generate_blog(request):
         )
 
     try:
-        client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+        api_key = os.getenv('GROQ_API_KEY')
+
+        if not api_key:
+            return Response(
+                {'error': 'GROQ_API_KEY is not configured on the AI service'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        client = Groq(api_key=api_key)
 
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
