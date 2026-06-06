@@ -101,7 +101,13 @@ function Posts() {
                                     <span style={styles.featuredBadge}>Featured</span>
                                 )}
                                 <div style={styles.cardMeta}>
-                                    <span style={styles.author}>@{post.author_username}</span>
+                                    <Link
+    to={`/profile/${post.author_username}`}
+    style={styles.author}
+    onClick={e => e.stopPropagation()}
+>
+    @{post.author_username}
+</Link>
                                     <span style={styles.dot}>·</span>
                                     <span style={styles.date}>
                                         {new Date(post.created_at).toLocaleDateString('en-US', {

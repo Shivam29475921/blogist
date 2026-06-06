@@ -6,6 +6,8 @@ import Register from './pages/Register'
 import Posts from './pages/Posts'
 import PostDetail from './pages/PostDetail'
 import CreatePost from './pages/CreatePost'
+import Profile from './pages/Profile'
+
 
 const ProtectedRoute = ({ children }) => {
     const { token } = useAuth()
@@ -22,6 +24,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/posts" element={<Posts />} />
                 <Route path="/posts/:id" element={<PostDetail />} />
+                <Route path='/profile/:username' element={<Profile />}/>
                 <Route
                     path="/posts/create"
                     element={

@@ -11,27 +11,33 @@ const getAuthHeader =()=> {
     } : {}
 }
 
-//Auth servies
-export const authAPI ={
-    register: (data)=> axios.post(`${AUTH_URL}/api/auth/register/`, data),
+
+// Auth Service
+export const authAPI = {
+    register: (data) => axios.post(`${AUTH_URL}/api/auth/register/`, data),
     login: (data) => axios.post(`${AUTH_URL}/api/auth/login/`, data),
-    profile: () => axios.get(`${AUTH_URL}/api/auth/profile/`, { headers: getAuthHeader() })
+    profile: () => axios.get(`${AUTH_URL}/api/auth/profile/`, {
+        headers: getAuthHeader()
+    }),
+    publicProfile: (username) => axios.get(`${AUTH_URL}/api/auth/users/${username}/`),
 }
 
-//post services
+// Post Service
 export const postAPI = {
     getPosts: () => axios.get(`${POST_URL}/api/posts/`),
+    getPostsByAuthor: (username) => axios.get(`${POST_URL}/api/posts/?author=${username}`),
     getPost: (id) => axios.get(`${POST_URL}/api/posts/${id}/`),
     createPost: (data) => axios.post(`${POST_URL}/api/posts/create/`, data, {
-        headers: getAuthHeaders()
+        headers: getAuthHeader()
     }),
     deletePost: (id) => axios.delete(`${POST_URL}/api/posts/${id}/`, {
-        headers: getAuthHeaders()
+        headers: getAuthHeader()
     }),
     toggleLike: (id) => axios.post(`${POST_URL}/api/posts/${id}/like/`, {}, {
-        headers: getAuthHeaders()
+        headers: getAuthHeader()
     }),
 }
+
 
 //comment service
 export const commentAPI={

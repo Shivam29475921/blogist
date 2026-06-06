@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 import { postAPI, commentAPI } from '../api/axios'
 import { useAuth } from '../context/AuthContext'
-import ReactMarkdown from 'react-markdown'
 
 
 function PostDetail() {
@@ -81,7 +81,12 @@ function PostDetail() {
                 <div style={styles.postHeader}>
                     <h1 style={styles.title}>{post.title}</h1>
                     <div style={styles.meta}>
-                        <span>@{post.author_username}</span>
+                        <Link
+    to={`/profile/${post.author_username}`}
+    style={{ color: '#888', fontSize: '13px' }}
+>
+    @{post.author_username}
+</Link>
                         <span>{new Date(post.created_at).toLocaleDateString()}</span>
                         {user && user.id === post.author_id && (
                             <button onClick={handleDelete} style={styles.deleteButton}>

@@ -1,4 +1,3 @@
-import os
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -6,11 +5,14 @@ from rest_framework.response import Response
 from .models import Post, Like
 from .serializers import PostSerializer
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_posts(request):
-    posts = Post.objects.all()
+    author_username = request.query_params.get('author', None)
+    if author_username:
+        posts = Post.objects.filter(author_username=author_username)
+    else:
+        posts = Post.objects.all()
     serializer = PostSerializer(posts, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -29,6 +31,7 @@ def create_post(request):
 
 
 @api_view(['GET', 'DELETE'])
+@permission_classes([AllowAny])
 def post_detail(request, pk):
     try:
         post = Post.objects.get(pk=pk)
@@ -43,6 +46,12 @@ def post_detail(request, pk):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     if request.method == 'DELETE':
+        if not request.user or not request.user.is_authenticated:
+            return Response(
+                {'error': 'Authentication credentials were not provided.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         if post.author_id != request.user.id:
             return Response(
                 {'error': 'You can only delete your own posts'},
