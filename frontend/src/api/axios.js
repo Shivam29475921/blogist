@@ -4,7 +4,6 @@ const AUTH_URL = 'http://localhost:8001'
 const POST_URL = 'http://localhost:8002'
 const COMMENT_URL = 'http://localhost:8003'
 const AI_URL = 'http://localhost:8004'
-
 const getAuthHeaders = () => {
     const token = localStorage.getItem('access_token') || localStorage.getItem('token')
     return token ? { Authorization: `Bearer ${token}` } : {}

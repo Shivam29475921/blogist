@@ -1,0 +1,118 @@
+services:
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: foliodb
+      POSTGRES_USER: foliouser
+      POSTGRES_PASSWORD: foliopassword
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foliouser -d foliodb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build: ./services/auth-service
+    ports:
+      - "8001:8001"
+    environment:
+      SECRET_KEY: django-insecure-folio-auth-secret-key-change-in-prod
+      DEBUG: "True"
+      DB_NAME: foliodb
+      DB_USER: foliouser
+      DB_PASSWORD: foliopassword
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8001"
+    restart: on-failure
+
+  post-service:
+    build: ./services/post-service
+    ports:
+      - "8002:8002"
+    environment:
+      SECRET_KEY: django-insecure-folio-auth-secret-key-change-in-prod
+      DEBUG: "True"
+      DB_NAME: foliodb
+      DB_USER: foliouser
+      DB_PASSWORD: foliopassword
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "sleep 10 &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8002"
+    restart: on-failure
+
+  comment-service:
+    build: ./services/comment-service
+    ports:
+      - "8003:8003"
+    environment:
+      SECRET_KEY: django-insecure-folio-auth-secret-key-change-in-prod
+      DEBUG: "True"
+      DB_NAME: foliodb
+      DB_USER: foliouser
+      DB_PASSWORD: foliopassword
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "sleep 20 &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8003"
+    restart: on-failure
+
+  ai-service:
+    build: ./services/ai-service
+    ports:
+      - "8004:8004"
+    environment:
+      SECRET_KEY: django-insecure-folio-auth-secret-key-change-in-prod
+      DEBUG: "True"
+      DB_NAME: foliodb
+      DB_USER: foliouser
+      DB_PASSWORD: foliopassword
+      DB_HOST: db
+      DB_PORT: 5432
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "sleep 30 &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8004"
+    restart: on-failure
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_AUTH_URL: http://auth-service:8001
+      VITE_POST_URL: http://post-service:8002
+      VITE_COMMENT_URL: http://comment-service:8003
+      VITE_AI_URL: http://ai-service:8004
+    depends_on:
+      - auth-service
+      - post-service
+      - comment-service
+      - ai-service
+volumes:
+  postgres_data:

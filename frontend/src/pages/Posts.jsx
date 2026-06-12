@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { postAPI } from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
+
 function Posts() {
     const [posts, setPosts] = useState([])
     const [loading, setLoading] = useState(true)
     const { user } = useAuth()
     const navigate = useNavigate()
+    const [deleteConfirm, setDeleteConfirm] = useState(null)
 
     useEffect(() => {
         fetchPosts()
@@ -25,16 +27,21 @@ function Posts() {
     }
 
     const handleDelete = async (e, postId) => {
-        e.preventDefault()
-        e.stopPropagation()
-        if (!window.confirm('Delete this post?')) return
-        try {
-            await postAPI.deletePost(postId)
-            setPosts(posts.filter(p => p.id !== postId))
-        } catch (err) {
-            alert('Failed to delete.')
-        }
+    e.preventDefault()
+    e.stopPropagation()
+    setDeleteConfirm(postId)
+}
+
+const confirmDelete = async () => {
+    try {
+        await postAPI.deletePost(deleteConfirm)
+        setPosts(posts.filter(p => p.id !== deleteConfirm))
+        setDeleteConfirm(null)
+    } catch (err) {
+        alert('Failed to delete.')
+        setDeleteConfirm(null)
     }
+}
 
     const handleLike = async (e, postId) => {
         e.preventDefault()
@@ -191,6 +198,28 @@ function Posts() {
                     </div>
                 </aside>
             </div>
+            {deleteConfirm && (
+    <div style={styles.overlay}>
+        <div style={styles.modal}>
+            <h3 style={styles.modalTitle}>Delete post?</h3>
+            <p style={styles.modalText}>This action cannot be undone.</p>
+            <div style={styles.modalActions}>
+                <button
+                    onClick={() => setDeleteConfirm(null)}
+                    style={styles.cancelBtn}
+                >
+                    Cancel
+                </button>
+                <button
+                    onClick={confirmDelete}
+                    style={styles.confirmBtn}
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     )
 }
@@ -400,6 +429,63 @@ const styles = {
         fontFamily: 'Lora, serif',
     },
     statLabel: { fontSize: '13px', color: '#888' },
+    overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+},
+modal: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    padding: '32px',
+    width: '100%',
+    maxWidth: '360px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+},
+modalTitle: {
+    fontFamily: 'Lora, serif',
+    fontSize: '20px',
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: '8px',
+},
+modalText: {
+    fontSize: '14px',
+    color: '#888',
+    marginBottom: '24px',
+},
+modalActions: {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'flex-end',
+},
+cancelBtn: {
+    padding: '8px 20px',
+    backgroundColor: '#fff',
+    color: '#444',
+    border: '1px solid #ddd',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontFamily: 'DM Sans, sans-serif',
+},
+confirmBtn: {
+    padding: '8px 20px',
+    backgroundColor: '#cc0000',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontFamily: 'DM Sans, sans-serif',
+},
 }
 
 export default Posts

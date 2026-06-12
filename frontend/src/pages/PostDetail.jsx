@@ -16,6 +16,7 @@ function PostDetail() {
     const [loading, setLoading] = useState(true)
     const [commentLoading, setCommentLoading] = useState(false)
     const [error, setError] = useState('')
+    const [deleteConfirm, setDeleteConfirm] = useState(false)
 
     useEffect(() => {
         fetchPost()
@@ -60,15 +61,20 @@ function PostDetail() {
         }
     }
 
-    const handleDelete = async () => {
-        if (!window.confirm('Delete this post?')) return
+    const handleDelete = () => {
+        setDeleteConfirm(true)
+    }
+
+    const confirmDelete = async () => {
         try {
             await postAPI.deletePost(id)
             navigate('/posts')
         } catch (err) {
             alert('Failed to delete post.')
+        } finally {
+            setDeleteConfirm(false)
         }
-    }
+    } 
 
     if (loading) return <div style={styles.center}>Loading...</div>
     if (error) return <div style={styles.center}>{error}</div>
@@ -149,6 +155,28 @@ function PostDetail() {
                     )}
                 </div>
             </div>
+            {deleteConfirm && (
+    <div style={styles.overlay}>
+        <div style={styles.modal}>
+            <h3 style={styles.modalTitle}>Delete post?</h3>
+            <p style={styles.modalText}>This action cannot be undone.</p>
+            <div style={styles.modalActions}>
+                <button
+                    onClick={() => setDeleteConfirm(false)}
+                    style={styles.cancelBtn}
+                >
+                    Cancel
+                </button>
+                <button
+                    onClick={confirmDelete}
+                    style={styles.confirmBtn}
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     )
 }
@@ -297,6 +325,63 @@ const styles = {
         fontSize: '14px',
         lineHeight: '1.6',
     },
+    overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+},
+modal: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    padding: '32px',
+    width: '100%',
+    maxWidth: '360px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+},
+modalTitle: {
+    fontFamily: 'Lora, serif',
+    fontSize: '20px',
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: '8px',
+},
+modalText: {
+    fontSize: '14px',
+    color: '#888',
+    marginBottom: '24px',
+},
+modalActions: {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'flex-end',
+},
+cancelBtn: {
+    padding: '8px 20px',
+    backgroundColor: '#fff',
+    color: '#444',
+    border: '1px solid #ddd',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontFamily: 'DM Sans, sans-serif',
+},
+confirmBtn: {
+    padding: '8px 20px',
+    backgroundColor: '#cc0000',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontFamily: 'DM Sans, sans-serif',
+},
 }
 
 export default PostDetail
