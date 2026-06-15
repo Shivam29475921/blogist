@@ -23,6 +23,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=50, unique=True)
+    display_name = models.CharField(max_length=80, blank=True)
     bio = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
@@ -48,3 +49,19 @@ class Follow(models.Model):
 
     def __str__(self):
         return f'{self.follower_username} follows {self.following_username}'
+
+
+class Notification(models.Model):
+    recipient_id = models.IntegerField()
+    actor_id = models.IntegerField()
+    actor_username = models.CharField(max_length=50)
+    notification_type = models.CharField(max_length=20)
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.message

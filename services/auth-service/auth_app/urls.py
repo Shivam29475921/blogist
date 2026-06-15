@@ -8,4 +8,6 @@ urlpatterns = [
     path('users/<str:username>/', views.public_profile, name='public_profile'),
     path('users/<str:username>/follow/', views.toggle_follow, name='toggle_follow'),
     path('users/<str:username>/follow-status/', views.follow_status, name='follow_status'),
+    path('notifications/', views.notifications, name='notifications'),
+    path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
 ]

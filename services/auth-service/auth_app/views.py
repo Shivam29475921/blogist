@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
-from .models import User, Follow
+from .models import User, Follow, Notification
 
 
 @api_view(['POST'])
@@ -72,6 +72,7 @@ def public_profile(request, username):
         {
             'id': user.id,
             'username': user.username,
+            'display_name': user.display_name,
             'bio': user.bio,
             'created_at': user.created_at,
         },
@@ -110,6 +111,13 @@ def toggle_follow(request, username):
         following = False
     else:
         following = True
+        Notification.objects.create(
+            recipient_id=target_user.id,
+            actor_id=request.user.id,
+            actor_username=request.user.username,
+            notification_type='follow',
+            message=f'@{request.user.username} followed you',
+        )
 
     return Response(
         {
@@ -118,6 +126,14 @@ def toggle_follow(request, username):
         },
         status=status.HTTP_200_OK
     )
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_notifications_read(request):
+    Notification.objects.filter(
+        recipient_id=request.user.id,
+        is_read=False
+    ).update(is_read=True)
+    return Response({'status': 'ok'})
 
 
 @api_view(['GET'])
@@ -146,6 +162,34 @@ def follow_status(request, username):
             'followers_count': followers_count,
             'following_count': following_count,
             'is_following': is_following,
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def notifications(request):
+    items = Notification.objects.filter(recipient_id=request.user.id)[:20]
+    unread_count = Notification.objects.filter(
+        recipient_id=request.user.id,
+        is_read=False
+    ).count()
+    return Response(
+        {
+            'unread_count': unread_count,
+            'notifications': [
+                {
+                    'id': item.id,
+                    'type': item.notification_type,
+                    'message': item.message,
+                    'actor_username': item.actor_username,
+                    'is_read': item.is_read,
+                    'created_at': item.created_at,
+                    'source': 'auth',
+                }
+                for item in items
+            ]
         },
         status=status.HTTP_200_OK
     )

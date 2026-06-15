@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { postAPI, commentAPI } from '../api/axios'
 import { useAuth } from '../context/AuthContext'
-
+import BackButton from '../components/BackButton'
 
 function PostDetail() {
     const { id } = useParams()
@@ -18,10 +18,7 @@ function PostDetail() {
     const [error, setError] = useState('')
     const [deleteConfirm, setDeleteConfirm] = useState(false)
 
-    useEffect(() => {
-        fetchPost()
-        fetchComments()
-    }, [id])
+    useEffect(() => { fetchPost(); fetchComments() }, [id])
 
     const fetchPost = async () => {
         try {
@@ -50,6 +47,7 @@ function PostDetail() {
         try {
             const response = await commentAPI.addComment({
                 post_id: parseInt(id),
+                post_author_id: post.author_id,
                 content: newComment
             })
             setComments([response.data, ...comments])
@@ -61,10 +59,6 @@ function PostDetail() {
         }
     }
 
-    const handleDelete = () => {
-        setDeleteConfirm(true)
-    }
-
     const confirmDelete = async () => {
         try {
             await postAPI.deletePost(id)
@@ -74,314 +68,363 @@ function PostDetail() {
         } finally {
             setDeleteConfirm(false)
         }
-    } 
+    }
 
-    if (loading) return <div style={styles.center}>Loading...</div>
-    if (error) return <div style={styles.center}>{error}</div>
+    if (loading) return (
+        <div style={styles.center}>
+            <p style={styles.loadingText}>Loading...</p>
+        </div>
+    )
+    if (error) return (
+        <div style={styles.center}>
+            <p style={styles.loadingText}>{error}</p>
+        </div>
+    )
     if (!post) return null
 
     return (
-        <div style={styles.container}>
-            {/* Post */}
-            <div style={styles.post}>
-                <div style={styles.postHeader}>
-                    <h1 style={styles.title}>{post.title}</h1>
-                    <div style={styles.meta}>
-                        <Link
-    to={`/profile/${post.author_username}`}
-    style={{ color: '#888', fontSize: '13px' }}
->
-    @{post.author_username}
-</Link>
-                        <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                        {user && user.id === post.author_id && (
-                            <button onClick={handleDelete} style={styles.deleteButton}>
-                                Delete Post
+        <div style={styles.page}>
+            {/* Film grain */}
+            <div aria-hidden style={styles.grain} />
+
+            <div style={styles.container}>
+                <BackButton />
+
+                {/* Post */}
+                <div style={styles.post}>
+                    <div style={styles.postHeader}>
+                        <h1 style={styles.title}>{post.title}</h1>
+                        <div style={styles.meta}>
+                            <Link to={`/profile/${post.author_username}`} style={styles.metaAuthor}>
+                                @{post.author_username}
+                            </Link>
+                            <span style={styles.metaDot}>·</span>
+                            <span style={styles.metaDate}>
+                                {new Date(post.created_at).toLocaleDateString('en-US', {
+                                    month: 'long', day: 'numeric', year: 'numeric'
+                                })}
+                            </span>
+                            {user && user.id === post.author_id && (
+                                <button onClick={() => setDeleteConfirm(true)} style={styles.deleteButton}>
+                                    Delete
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div style={styles.content}>
+                        <ReactMarkdown>{post.content}</ReactMarkdown>
+                    </div>
+                </div>
+
+                {/* Comments */}
+                <div style={styles.commentsSection}>
+                    <p style={styles.commentsKicker}>RESPONSES · {comments.length}</p>
+
+                    {user ? (
+                        <form onSubmit={handleAddComment} style={styles.commentForm}>
+                            <textarea
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                placeholder="Write a response..."
+                                style={styles.textarea}
+                                rows={3}
+                            />
+                            <button
+                                type="submit"
+                                style={commentLoading ? styles.buttonDisabled : styles.button}
+                                disabled={commentLoading}
+                            >
+                                {commentLoading ? 'POSTING...' : 'POST →'}
                             </button>
+                        </form>
+                    ) : (
+                        <p style={styles.loginPrompt}>
+                            <Link to="/login" style={styles.loginLink}>Sign in</Link>
+                            {' '}to leave a response
+                        </p>
+                    )}
+
+                    <div style={styles.commentsList}>
+                        {comments.length === 0 ? (
+                            <p style={styles.noComments}>No responses yet. Be the first.</p>
+                        ) : (
+                            comments.map(comment => (
+                                <div key={comment.id} style={styles.comment}>
+                                    <div style={styles.commentHeader}>
+                                        <span style={styles.commentAuthor}>@{comment.author_username}</span>
+                                        <span style={styles.commentDate}>
+                                            {new Date(comment.created_at).toLocaleDateString('en-US', {
+                                                month: 'short', day: 'numeric'
+                                            })}
+                                        </span>
+                                    </div>
+                                    <p style={styles.commentContent}>{comment.content}</p>
+                                </div>
+                            ))
                         )}
                     </div>
                 </div>
-                <div style={styles.content}><ReactMarkdown>{post.content}</ReactMarkdown></div>
             </div>
 
-            {/* Comments */}
-            <div style={styles.commentsSection}>
-                <h3 style={styles.commentsTitle}>
-                    Comments ({comments.length})
-                </h3>
-
-                {/* Add Comment */}
-                {user ? (
-                    <form onSubmit={handleAddComment} style={styles.commentForm}>
-                        <textarea
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Write a comment..."
-                            style={styles.textarea}
-                            rows={3}
-                        />
-                        <button
-                            type="submit"
-                            style={commentLoading ? styles.buttonDisabled : styles.button}
-                            disabled={commentLoading}
-                        >
-                            {commentLoading ? 'Posting...' : 'Post Comment'}
-                        </button>
-                    </form>
-                ) : (
-                    <p style={styles.loginPrompt}>
-                        <a href="/login" style={styles.link}>Login</a> to leave a comment
-                    </p>
-                )}
-
-                {/* Comments List */}
-                <div style={styles.commentsList}>
-                    {comments.length === 0 ? (
-                        <p style={styles.noComments}>No comments yet. Be the first!</p>
-                    ) : (
-                        comments.map(comment => (
-                            <div key={comment.id} style={styles.comment}>
-                                <div style={styles.commentHeader}>
-                                    <span style={styles.commentAuthor}>
-                                        @{comment.author_username}
-                                    </span>
-                                    <span style={styles.commentDate}>
-                                        {new Date(comment.created_at).toLocaleDateString()}
-                                    </span>
-                                </div>
-                                <p style={styles.commentContent}>{comment.content}</p>
-                            </div>
-                        ))
-                    )}
-                </div>
-            </div>
             {deleteConfirm && (
-    <div style={styles.overlay}>
-        <div style={styles.modal}>
-            <h3 style={styles.modalTitle}>Delete post?</h3>
-            <p style={styles.modalText}>This action cannot be undone.</p>
-            <div style={styles.modalActions}>
-                <button
-                    onClick={() => setDeleteConfirm(false)}
-                    style={styles.cancelBtn}
-                >
-                    Cancel
-                </button>
-                <button
-                    onClick={confirmDelete}
-                    style={styles.confirmBtn}
-                >
-                    Delete
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+                <div style={styles.overlay}>
+                    <div style={styles.modal}>
+                        <h3 style={styles.modalTitle}>Delete post?</h3>
+                        <p style={styles.modalText}>This action cannot be undone.</p>
+                        <div style={styles.modalActions}>
+                            <button onClick={() => setDeleteConfirm(false)} style={styles.cancelBtn}>Cancel</button>
+                            <button onClick={confirmDelete} style={styles.confirmBtn}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
 
 const styles = {
+    page: {
+        minHeight: '100vh',
+        backgroundColor: '#111111',
+        fontFamily: 'DM Sans, sans-serif',
+        position: 'relative',
+    },
+    grain: {
+        pointerEvents: 'none',
+        position: 'fixed',
+        inset: 0,
+        opacity: 0.04,
+        mixBlendMode: 'overlay',
+        zIndex: 0,
+        backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+    },
     container: {
-        maxWidth: '800px',
+        maxWidth: '780px',
         margin: '0 auto',
-        padding: '40px 20px',
+        padding: '40px 24px',
+        position: 'relative',
+        zIndex: 1,
     },
     center: {
-        textAlign: 'center',
-        padding: '80px 20px',
-        color: '#888',
+        minHeight: '100vh',
+        backgroundColor: '#111111',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loadingText: {
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'monospace',
+        fontSize: 11,
+        letterSpacing: '0.2em',
     },
     post: {
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        padding: '32px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        marginBottom: '32px',
+        marginBottom: 48,
+        paddingBottom: 48,
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
     },
     postHeader: {
-        marginBottom: '24px',
-        paddingBottom: '16px',
-        borderBottom: '1px solid #f0f0f0',
+        marginBottom: 32,
+        paddingBottom: 20,
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
     },
     title: {
-        fontSize: '28px',
-        fontWeight: 'bold',
-        color: '#111',
-        marginBottom: '12px',
+        fontFamily: 'Lora, serif',
+        fontSize: 32,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.92)',
+        marginBottom: 16,
+        lineHeight: '1.3',
+        letterSpacing: '-0.3px',
     },
     meta: {
         display: 'flex',
-        gap: '16px',
+        gap: 10,
         alignItems: 'center',
-        color: '#888',
-        fontSize: '13px',
+    },
+    metaAuthor: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.45)',
+        textDecoration: 'none',
+        fontWeight: 500,
+    },
+    metaDot: {
+        color: 'rgba(255,255,255,0.2)',
+        fontSize: 13,
+    },
+    metaDate: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.3)',
     },
     deleteButton: {
         marginLeft: 'auto',
         background: 'none',
-        border: '1px solid #ffcccc',
-        color: '#cc0000',
+        border: '1px solid rgba(200,60,60,0.3)',
+        color: 'rgba(200,80,80,0.7)',
         padding: '4px 10px',
-        borderRadius: '4px',
         cursor: 'pointer',
-        fontSize: '12px',
+        fontSize: 11,
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
     },
     content: {
-        color: '#333',
-        lineHeight: '1.8',
-        fontSize: '16px',
-        whiteSpace: 'pre-wrap',
+        color: 'rgba(255,255,255,0.72)',
+        lineHeight: '1.9',
+        fontSize: 16,
+        fontFamily: 'DM Sans, sans-serif',
     },
     commentsSection: {
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        padding: '32px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-    },
-    commentsTitle: {
-        fontSize: '18px',
-        fontWeight: '600',
-        marginBottom: '20px',
-        color: '#111',
-    },
-    commentForm: {
-        marginBottom: '24px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
+        gap: 20,
+    },
+    commentsKicker: {
+        fontSize: 9,
+        letterSpacing: '0.3em',
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'monospace',
+        marginBottom: 4,
+    },
+    commentForm: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
     },
     textarea: {
-        padding: '10px 14px',
-        border: '1px solid #ddd',
-        borderRadius: '4px',
-        fontSize: '14px',
+        padding: '12px 14px',
+        border: '1px solid rgba(255,255,255,0.1)',
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 14,
         resize: 'vertical',
         outline: 'none',
-        fontFamily: 'sans-serif',
+        fontFamily: 'DM Sans, sans-serif',
+        lineHeight: '1.6',
+        borderRadius: 0,
     },
     button: {
         alignSelf: 'flex-end',
         padding: '8px 20px',
-        backgroundColor: '#111',
-        color: '#fff',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        color: '#111',
         border: 'none',
-        borderRadius: '4px',
         cursor: 'pointer',
-        fontSize: '13px',
+        fontSize: 9,
+        fontFamily: 'monospace',
+        letterSpacing: '0.2em',
+        fontWeight: 700,
     },
     buttonDisabled: {
         alignSelf: 'flex-end',
         padding: '8px 20px',
-        backgroundColor: '#888',
-        color: '#fff',
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        color: 'rgba(255,255,255,0.3)',
         border: 'none',
-        borderRadius: '4px',
         cursor: 'not-allowed',
-        fontSize: '13px',
+        fontSize: 9,
+        fontFamily: 'monospace',
+        letterSpacing: '0.2em',
     },
     loginPrompt: {
-        color: '#888',
-        fontSize: '14px',
-        marginBottom: '20px',
+        color: 'rgba(255,255,255,0.3)',
+        fontSize: 13,
+        fontFamily: 'DM Sans, sans-serif',
     },
-    link: {
-        color: '#111',
-        fontWeight: '500',
+    loginLink: {
+        color: 'rgba(255,255,255,0.6)',
+        textDecoration: 'underline',
+        textUnderlineOffset: 3,
     },
     commentsList: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
+        gap: 0,
     },
     noComments: {
-        color: '#aaa',
-        fontSize: '14px',
-        textAlign: 'center',
-        padding: '20px 0',
+        color: 'rgba(255,255,255,0.2)',
+        fontSize: 13,
+        fontFamily: 'DM Sans, sans-serif',
+        padding: '24px 0',
     },
     comment: {
-        padding: '16px',
-        backgroundColor: '#f9f9f9',
-        borderRadius: '6px',
+        padding: '20px 0',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
     },
     commentHeader: {
         display: 'flex',
-        gap: '12px',
-        marginBottom: '8px',
+        gap: 10,
+        marginBottom: 8,
         alignItems: 'center',
     },
     commentAuthor: {
-        fontWeight: '500',
-        fontSize: '13px',
-        color: '#444',
+        fontWeight: 500,
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.5)',
     },
     commentDate: {
-        color: '#aaa',
-        fontSize: '12px',
+        color: 'rgba(255,255,255,0.2)',
+        fontSize: 12,
     },
     commentContent: {
-        color: '#555',
-        fontSize: '14px',
-        lineHeight: '1.6',
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 14,
+        lineHeight: '1.7',
+        margin: 0,
     },
     overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-},
-modal: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    padding: '32px',
-    width: '100%',
-    maxWidth: '360px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-},
-modalTitle: {
-    fontFamily: 'Lora, serif',
-    fontSize: '20px',
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: '8px',
-},
-modalText: {
-    fontSize: '14px',
-    color: '#888',
-    marginBottom: '24px',
-},
-modalActions: {
-    display: 'flex',
-    gap: '12px',
-    justifyContent: 'flex-end',
-},
-cancelBtn: {
-    padding: '8px 20px',
-    backgroundColor: '#fff',
-    color: '#444',
-    border: '1px solid #ddd',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontFamily: 'DM Sans, sans-serif',
-},
-confirmBtn: {
-    padding: '8px 20px',
-    backgroundColor: '#cc0000',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontFamily: 'DM Sans, sans-serif',
-},
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+    },
+    modal: {
+        backgroundColor: '#1a1a1a',
+        border: '1px solid rgba(255,255,255,0.1)',
+        padding: '32px',
+        width: '100%',
+        maxWidth: '360px',
+    },
+    modalTitle: {
+        fontFamily: 'Lora, serif',
+        fontSize: 20,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.88)',
+        marginBottom: 8,
+    },
+    modalText: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.4)',
+        marginBottom: 24,
+        fontFamily: 'DM Sans, sans-serif',
+    },
+    modalActions: {
+        display: 'flex',
+        gap: 12,
+        justifyContent: 'flex-end',
+    },
+    cancelBtn: {
+        padding: '8px 20px',
+        backgroundColor: 'transparent',
+        color: 'rgba(255,255,255,0.5)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        cursor: 'pointer',
+        fontSize: 12,
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
+    },
+    confirmBtn: {
+        padding: '8px 20px',
+        backgroundColor: 'rgba(180,30,30,0.8)',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: 12,
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
+    },
 }
 
 export default PostDetail

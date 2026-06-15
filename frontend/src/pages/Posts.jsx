@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { postAPI } from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
-
 function Posts() {
     const [posts, setPosts] = useState([])
     const [loading, setLoading] = useState(true)
@@ -11,9 +10,7 @@ function Posts() {
     const navigate = useNavigate()
     const [deleteConfirm, setDeleteConfirm] = useState(null)
 
-    useEffect(() => {
-        fetchPosts()
-    }, [])
+    useEffect(() => { fetchPosts() }, [])
 
     const fetchPosts = async () => {
         try {
@@ -27,21 +24,21 @@ function Posts() {
     }
 
     const handleDelete = async (e, postId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDeleteConfirm(postId)
-}
-
-const confirmDelete = async () => {
-    try {
-        await postAPI.deletePost(deleteConfirm)
-        setPosts(posts.filter(p => p.id !== deleteConfirm))
-        setDeleteConfirm(null)
-    } catch (err) {
-        alert('Failed to delete.')
-        setDeleteConfirm(null)
+        e.preventDefault()
+        e.stopPropagation()
+        setDeleteConfirm(postId)
     }
-}
+
+    const confirmDelete = async () => {
+        try {
+            await postAPI.deletePost(deleteConfirm)
+            setPosts(posts.filter(p => p.id !== deleteConfirm))
+            setDeleteConfirm(null)
+        } catch (err) {
+            alert('Failed to delete.')
+            setDeleteConfirm(null)
+        }
+    }
 
     const handleLike = async (e, postId) => {
         e.preventDefault()
@@ -61,35 +58,36 @@ const confirmDelete = async () => {
 
     if (loading) return (
         <div style={styles.loadingScreen}>
-            <div style={styles.loadingDot} />
+            <p style={styles.loadingText}>Loading...</p>
         </div>
     )
 
     return (
         <div style={styles.page}>
+            {/* Film grain */}
+            <div aria-hidden style={styles.grain} />
+
             {/* Hero */}
             <div style={styles.hero}>
+                <p style={styles.heroKicker}>THE FOLIO OBSERVER</p>
                 <h1 style={styles.heroTitle}>Ideas worth reading</h1>
-                <p style={styles.heroSub}>
-                    Thoughtful writing from the Folio community
-                </p>
+                <p style={styles.heroSub}>Thoughtful writing from the Folio community</p>
                 {user && (
                     <Link to="/posts/create" style={styles.heroBtn}>
-                        Start writing
+                        Start writing →
                     </Link>
                 )}
             </div>
 
             {/* Feed */}
             <div style={styles.layout}>
-                {/* Main Feed */}
                 <main style={styles.feed}>
                     {posts.length === 0 ? (
                         <div style={styles.empty}>
                             <p style={styles.emptyTitle}>Nothing here yet</p>
                             <p style={styles.emptySub}>Be the first to publish on Folio</p>
                             {user && (
-                                <Link to="/posts/create" style={styles.emptyBtn}>
+                                <Link to="/posts/create" style={styles.heroBtn}>
                                     Write the first post
                                 </Link>
                             )}
@@ -98,23 +96,20 @@ const confirmDelete = async () => {
                         posts.map((post, index) => (
                             <article
                                 key={post.id}
-                                style={{
-                                    ...styles.card,
-                                    ...(index === 0 ? styles.cardFirst : {})
-                                }}
+                                style={{ ...styles.card, ...(index === 0 ? styles.cardFirst : {}) }}
                                 onClick={() => navigate(`/posts/${post.id}`)}
                             >
                                 {index === 0 && (
-                                    <span style={styles.featuredBadge}>Featured</span>
+                                    <span style={styles.featuredBadge}>✦ FEATURED</span>
                                 )}
                                 <div style={styles.cardMeta}>
                                     <Link
-    to={`/profile/${post.author_username}`}
-    style={styles.author}
-    onClick={e => e.stopPropagation()}
->
-    @{post.author_username}
-</Link>
+                                        to={`/profile/${post.author_username}`}
+                                        style={styles.author}
+                                        onClick={e => e.stopPropagation()}
+                                    >
+                                        @{post.author_username}
+                                    </Link>
                                     <span style={styles.dot}>·</span>
                                     <span style={styles.date}>
                                         {new Date(post.created_at).toLocaleDateString('en-US', {
@@ -140,10 +135,7 @@ const confirmDelete = async () => {
                                     <div style={styles.footerRight}>
                                         <button
                                             onClick={(e) => handleLike(e, post.id)}
-                                            style={{
-                                                ...styles.likeBtn,
-                                                ...(post.is_liked ? styles.likeBtnActive : {})
-                                            }}
+                                            style={{ ...styles.likeBtn, ...(post.is_liked ? styles.likeBtnActive : {}) }}
                                         >
                                             {post.is_liked ? '♥' : '♡'} {post.likes_count || 0}
                                         </button>
@@ -171,13 +163,9 @@ const confirmDelete = async () => {
                             Built with Django microservices, React, and deployed on AWS.
                         </p>
                         {user ? (
-                            <Link to="/posts/create" style={styles.sideBtn}>
-                                Write a post
-                            </Link>
+                            <Link to="/posts/create" style={styles.sideBtn}>Write a post →</Link>
                         ) : (
-                            <Link to="/register" style={styles.sideBtn}>
-                                Join Folio
-                            </Link>
+                            <Link to="/register" style={styles.sideBtn}>Join Folio →</Link>
                         )}
                     </div>
 
@@ -198,294 +186,311 @@ const confirmDelete = async () => {
                     </div>
                 </aside>
             </div>
+
             {deleteConfirm && (
-    <div style={styles.overlay}>
-        <div style={styles.modal}>
-            <h3 style={styles.modalTitle}>Delete post?</h3>
-            <p style={styles.modalText}>This action cannot be undone.</p>
-            <div style={styles.modalActions}>
-                <button
-                    onClick={() => setDeleteConfirm(null)}
-                    style={styles.cancelBtn}
-                >
-                    Cancel
-                </button>
-                <button
-                    onClick={confirmDelete}
-                    style={styles.confirmBtn}
-                >
-                    Delete
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+                <div style={styles.overlay}>
+                    <div style={styles.modal}>
+                        <h3 style={styles.modalTitle}>Delete post?</h3>
+                        <p style={styles.modalText}>This action cannot be undone.</p>
+                        <div style={styles.modalActions}>
+                            <button onClick={() => setDeleteConfirm(null)} style={styles.cancelBtn}>Cancel</button>
+                            <button onClick={confirmDelete} style={styles.confirmBtn}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
 
 const styles = {
-    page: { minHeight: '100vh' },
+    page: {
+        minHeight: '100vh',
+        backgroundColor: '#111111',
+        fontFamily: 'DM Sans, sans-serif',
+        position: 'relative',
+    },
+    grain: {
+        pointerEvents: 'none',
+        position: 'fixed',
+        inset: 0,
+        opacity: 0.04,
+        mixBlendMode: 'overlay',
+        zIndex: 0,
+        backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+    },
     loadingScreen: {
         height: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#111111',
     },
-    loadingDot: {
-        width: '8px',
-        height: '8px',
-        borderRadius: '50%',
-        backgroundColor: '#1a1a1a',
+    loadingText: {
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'monospace',
+        fontSize: 11,
+        letterSpacing: '0.2em',
     },
     hero: {
         textAlign: 'center',
         padding: '64px 24px 48px',
-        borderBottom: '1px solid #e8e4de',
-        backgroundColor: '#fff',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        position: 'relative',
+        zIndex: 1,
+    },
+    heroKicker: {
+        fontSize: 9,
+        letterSpacing: '0.35em',
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'monospace',
+        marginBottom: 16,
     },
     heroTitle: {
         fontFamily: 'Lora, serif',
-        fontSize: '42px',
-        fontWeight: '600',
-        color: '#1a1a1a',
-        marginBottom: '12px',
+        fontSize: 42,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.92)',
+        marginBottom: 12,
         letterSpacing: '-0.5px',
     },
     heroSub: {
-        fontSize: '16px',
-        color: '#888',
-        marginBottom: '28px',
-        fontWeight: '300',
+        fontSize: 15,
+        color: 'rgba(255,255,255,0.4)',
+        marginBottom: 28,
+        fontWeight: 300,
     },
     heroBtn: {
         display: 'inline-block',
-        backgroundColor: '#1a1a1a',
-        color: '#fff',
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        color: '#111',
         padding: '10px 24px',
-        borderRadius: '24px',
-        fontSize: '14px',
-        fontWeight: '500',
+        fontSize: 11,
+        fontWeight: 700,
+        fontFamily: 'monospace',
+        letterSpacing: '0.15em',
+        textDecoration: 'none',
     },
     layout: {
         maxWidth: '1100px',
         margin: '0 auto',
         padding: '48px 24px',
         display: 'grid',
-        gridTemplateColumns: '1fr 300px',
+        gridTemplateColumns: '1fr 280px',
         gap: '48px',
         alignItems: 'start',
+        position: 'relative',
+        zIndex: 1,
     },
     feed: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '0',
     },
     empty: { textAlign: 'center', padding: '80px 20px' },
     emptyTitle: {
         fontFamily: 'Lora, serif',
-        fontSize: '24px',
-        color: '#1a1a1a',
-        marginBottom: '8px',
+        fontSize: 24,
+        color: 'rgba(255,255,255,0.7)',
+        marginBottom: 8,
     },
-    emptySub: { color: '#888', fontSize: '14px', marginBottom: '24px' },
-    emptyBtn: {
-        display: 'inline-block',
-        backgroundColor: '#1a1a1a',
-        color: '#fff',
-        padding: '10px 20px',
-        borderRadius: '20px',
-        fontSize: '14px',
+    emptySub: {
+        color: 'rgba(255,255,255,0.3)',
+        fontSize: 14,
+        marginBottom: 24,
     },
     card: {
         padding: '28px 0',
-        borderBottom: '1px solid #e8e4de',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
         cursor: 'pointer',
     },
-    cardFirst: { paddingTop: '0' },
+    cardFirst: { paddingTop: 0 },
     featuredBadge: {
         display: 'inline-block',
-        fontSize: '11px',
-        fontWeight: '600',
-        color: '#888',
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        marginBottom: '12px',
+        fontSize: 9,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.3)',
+        letterSpacing: '0.2em',
+        fontFamily: 'monospace',
+        marginBottom: 12,
     },
     cardMeta: {
         display: 'flex',
         alignItems: 'center',
-        gap: '6px',
-        marginBottom: '10px',
+        gap: 6,
+        marginBottom: 10,
     },
-    author: { fontSize: '13px', fontWeight: '500', color: '#444' },
-    dot: { color: '#bbb', fontSize: '13px' },
-    date: { fontSize: '13px', color: '#aaa' },
+    author: {
+        fontSize: 13,
+        fontWeight: 500,
+        color: 'rgba(255,255,255,0.55)',
+        textDecoration: 'none',
+    },
+    dot: { color: 'rgba(255,255,255,0.2)', fontSize: 13 },
+    date: { fontSize: 13, color: 'rgba(255,255,255,0.3)' },
     cardTitle: {
         fontFamily: 'Lora, serif',
-        fontSize: '20px',
-        fontWeight: '600',
-        color: '#1a1a1a',
-        marginBottom: '10px',
+        fontSize: 20,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.88)',
+        marginBottom: 10,
         lineHeight: '1.4',
         letterSpacing: '-0.2px',
     },
     cardTitleLarge: {
         fontFamily: 'Lora, serif',
-        fontSize: '28px',
-        fontWeight: '600',
-        color: '#1a1a1a',
-        marginBottom: '12px',
+        fontSize: 28,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.92)',
+        marginBottom: 12,
         lineHeight: '1.3',
         letterSpacing: '-0.4px',
     },
     excerpt: {
-        fontSize: '15px',
-        color: '#666',
+        fontSize: 15,
+        color: 'rgba(255,255,255,0.45)',
         lineHeight: '1.7',
-        marginBottom: '16px',
-        fontWeight: '300',
+        marginBottom: 16,
+        fontWeight: 300,
     },
     cardFooter: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    readMore: { fontSize: '13px', color: '#1a1a1a', fontWeight: '500' },
+    readMore: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.6)',
+        fontWeight: 500,
+        textDecoration: 'none',
+    },
     footerRight: {
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
+        gap: 12,
     },
     likeBtn: {
-        fontSize: '14px',
-        color: '#aaa',
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.3)',
         background: 'none',
         border: 'none',
         cursor: 'pointer',
-        padding: '0',
+        padding: 0,
         fontFamily: 'DM Sans, sans-serif',
     },
-    likeBtnActive: {
-        color: '#e0245e',
-    },
+    likeBtnActive: { color: '#e0245e' },
     deleteBtn: {
-        fontSize: '12px',
-        color: '#cc0000',
+        fontSize: 12,
+        color: 'rgba(200,60,60,0.7)',
         background: 'none',
         border: 'none',
         cursor: 'pointer',
-        padding: '0',
+        padding: 0,
         fontFamily: 'DM Sans, sans-serif',
     },
     sidebar: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
+        gap: 16,
         position: 'sticky',
-        top: '80px',
+        top: 80,
     },
     sideCard: {
-        backgroundColor: '#fff',
-        border: '1px solid #e8e4de',
-        borderRadius: '8px',
+        border: '1px solid rgba(255,255,255,0.08)',
         padding: '20px',
+        backgroundColor: 'rgba(255,255,255,0.03)',
     },
     sideTitle: {
         fontFamily: 'Lora, serif',
-        fontSize: '16px',
-        fontWeight: '600',
-        color: '#1a1a1a',
-        marginBottom: '10px',
+        fontSize: 15,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.75)',
+        marginBottom: 10,
     },
     sideText: {
-        fontSize: '13px',
-        color: '#666',
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.4)',
         lineHeight: '1.6',
-        marginBottom: '16px',
-        fontWeight: '300',
+        marginBottom: 16,
+        fontWeight: 300,
     },
     sideBtn: {
         display: 'inline-block',
-        backgroundColor: '#1a1a1a',
-        color: '#fff',
-        padding: '8px 16px',
-        borderRadius: '20px',
-        fontSize: '13px',
-        fontWeight: '500',
+        border: '1px solid rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.7)',
+        padding: '7px 16px',
+        fontSize: 11,
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
+        textDecoration: 'none',
     },
     statRow: {
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
+        gap: 10,
         padding: '8px 0',
-        borderBottom: '1px solid #f0ece6',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
     },
     statNum: {
-        fontSize: '18px',
-        fontWeight: '600',
-        color: '#1a1a1a',
-        minWidth: '40px',
+        fontSize: 18,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.75)',
+        minWidth: 40,
         fontFamily: 'Lora, serif',
     },
-    statLabel: { fontSize: '13px', color: '#888' },
+    statLabel: { fontSize: 13, color: 'rgba(255,255,255,0.35)' },
     overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-},
-modal: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    padding: '32px',
-    width: '100%',
-    maxWidth: '360px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-},
-modalTitle: {
-    fontFamily: 'Lora, serif',
-    fontSize: '20px',
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: '8px',
-},
-modalText: {
-    fontSize: '14px',
-    color: '#888',
-    marginBottom: '24px',
-},
-modalActions: {
-    display: 'flex',
-    gap: '12px',
-    justifyContent: 'flex-end',
-},
-cancelBtn: {
-    padding: '8px 20px',
-    backgroundColor: '#fff',
-    color: '#444',
-    border: '1px solid #ddd',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontFamily: 'DM Sans, sans-serif',
-},
-confirmBtn: {
-    padding: '8px 20px',
-    backgroundColor: '#cc0000',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontFamily: 'DM Sans, sans-serif',
-},
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+    },
+    modal: {
+        backgroundColor: '#1a1a1a',
+        border: '1px solid rgba(255,255,255,0.1)',
+        padding: '32px',
+        width: '100%',
+        maxWidth: '360px',
+    },
+    modalTitle: {
+        fontFamily: 'Lora, serif',
+        fontSize: 20,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.88)',
+        marginBottom: 8,
+    },
+    modalText: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.4)',
+        marginBottom: 24,
+    },
+    modalActions: {
+        display: 'flex',
+        gap: 12,
+        justifyContent: 'flex-end',
+    },
+    cancelBtn: {
+        padding: '8px 20px',
+        backgroundColor: 'transparent',
+        color: 'rgba(255,255,255,0.5)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        cursor: 'pointer',
+        fontSize: 12,
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
+    },
+    confirmBtn: {
+        padding: '8px 20px',
+        backgroundColor: 'rgba(180,30,30,0.8)',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: 12,
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
+    },
 }
 
 export default Posts

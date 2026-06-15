@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
@@ -16,10 +17,9 @@ function Login() {
         e.preventDefault()
         setLoading(true)
         setError('')
-
         try {
             const response = await authAPI.login({ email, password })
-            login(response.data.user, response.data.tokens.access)
+            login(response.data.user, response.data.tokens.access, response.data.tokens.refresh)
             navigate('/posts')
         } catch (err) {
             setError(err.response?.data?.detail || 'Login failed. Check your credentials.')
@@ -30,15 +30,26 @@ function Login() {
 
     return (
         <div style={styles.container}>
+            <div aria-hidden style={styles.grain} />
+
             <div style={styles.card}>
-                <h2 style={styles.title}>Welcome back</h2>
-                <p style={styles.subtitle}>Sign in to Folio</p>
+                <Link to="/" style={{ textDecoration: 'none' }}>
+                    <div style={styles.masthead}>
+                        <span style={styles.mastheadTitle}>Folio</span>
+                        <span style={styles.mastheadSub}> · the observer</span>
+                    </div>
+                </Link>
+
+                <div style={styles.divider} />
+
+                <p style={styles.kicker}>SIGN IN · READER ACCESS</p>
+                <h2 style={styles.title}>Welcome back.</h2>
 
                 {error && <div style={styles.error}>{error}</div>}
 
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <div style={styles.field}>
-                        <label style={styles.label}>Email</label>
+                        <label style={styles.label}>EMAIL</label>
                         <input
                             type="email"
                             value={email}
@@ -50,15 +61,37 @@ function Login() {
                     </div>
 
                     <div style={styles.field}>
-                        <label style={styles.label}>Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            style={styles.input}
-                            placeholder="••••••••"
-                            required
-                        />
+                        <label style={styles.label}>PASSWORD</label>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                style={{ ...styles.input, width: '100%', boxSizing: 'border-box', paddingRight: 44 }}
+                                placeholder="••••••••"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(v => !v)}
+                                style={{
+                                    position: 'absolute',
+                                    right: 12,
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    color: 'rgba(255,255,255,0.35)',
+                                    fontSize: 13,
+                                    fontFamily: 'monospace',
+                                    letterSpacing: '0.05em',
+                                }}
+                            >
+                                {showPassword ? 'HIDE' : 'SHOW'}
+                            </button>
+                        </div>
                     </div>
 
                     <button
@@ -66,13 +99,15 @@ function Login() {
                         style={loading ? styles.buttonDisabled : styles.button}
                         disabled={loading}
                     >
-                        {loading ? 'Signing in...' : 'Sign in'}
+                        {loading ? 'SIGNING IN...' : 'SIGN IN →'}
                     </button>
                 </form>
 
+                <div style={styles.divider} />
+
                 <p style={styles.footer}>
-                    Don't have an account?{' '}
-                    <Link to="/register" style={styles.link}>Register</Link>
+                    No account?{' '}
+                    <Link to="/register" style={styles.link}>Create one</Link>
                 </p>
             </div>
         </div>
@@ -85,87 +120,134 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#080808',
+        fontFamily: 'Georgia, serif',
+        position: 'relative',
+    },
+    grain: {
+        pointerEvents: 'none',
+        position: 'fixed',
+        inset: 0,
+        opacity: 0.045,
+        mixBlendMode: 'overlay',
+        zIndex: 0,
+        backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
     },
     card: {
-        backgroundColor: '#fff',
-        padding: '40px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+        position: 'relative',
+        zIndex: 1,
         width: '100%',
         maxWidth: '400px',
+        padding: '48px 40px',
+        border: '1px solid rgba(255,255,255,0.08)',
+        backgroundColor: 'rgba(255,255,255,0.02)',
+    },
+    masthead: {
+        marginBottom: 0,
+    },
+    mastheadTitle: {
+        fontSize: 22,
+        fontWeight: 700,
+        color: 'rgba(255,255,255,0.92)',
+        letterSpacing: '-0.01em',
+        fontFamily: 'Georgia, serif',
+    },
+    mastheadSub: {
+        fontSize: 22,
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'Georgia, serif',
+    },
+    divider: {
+        height: 1,
+        background: 'rgba(255,255,255,0.08)',
+        margin: '20px 0',
+    },
+    kicker: {
+        fontSize: 9,
+        letterSpacing: '0.3em',
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'monospace',
+        marginBottom: 8,
     },
     title: {
-        fontSize: '24px',
-        fontWeight: 'bold',
-        marginBottom: '6px',
-        color: '#111',
-    },
-    subtitle: {
-        color: '#888',
-        marginBottom: '28px',
-        fontSize: '14px',
+        fontSize: 28,
+        fontWeight: 700,
+        color: 'rgba(255,255,255,0.9)',
+        marginBottom: 28,
+        letterSpacing: '-0.02em',
+        fontFamily: 'Georgia, serif',
     },
     error: {
-        backgroundColor: '#fff0f0',
-        color: '#cc0000',
+        border: '1px solid rgba(200,60,60,0.4)',
+        backgroundColor: 'rgba(200,60,60,0.08)',
+        color: 'rgba(220,100,100,0.9)',
         padding: '10px 14px',
-        borderRadius: '4px',
-        marginBottom: '16px',
-        fontSize: '14px',
+        marginBottom: 16,
+        fontSize: 12,
+        letterSpacing: '0.05em',
+        fontFamily: 'monospace',
     },
     form: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '18px',
+        gap: 20,
     },
     field: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '6px',
+        gap: 8,
     },
     label: {
-        fontSize: '13px',
-        fontWeight: '500',
-        color: '#444',
+        fontSize: 9,
+        letterSpacing: '0.25em',
+        color: 'rgba(255,255,255,0.35)',
+        fontFamily: 'monospace',
     },
     input: {
-        padding: '10px 14px',
-        border: '1px solid #ddd',
-        borderRadius: '4px',
-        fontSize: '14px',
+        padding: '11px 14px',
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        color: 'rgba(255,255,255,0.85)',
+        fontSize: 14,
+        fontFamily: 'Georgia, serif',
         outline: 'none',
+        borderRadius: 0,
     },
     button: {
-        padding: '11px',
-        backgroundColor: '#111',
-        color: '#fff',
+        padding: '12px',
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        color: '#080808',
         border: 'none',
-        borderRadius: '4px',
-        fontSize: '14px',
+        fontSize: 10,
+        letterSpacing: '0.25em',
+        fontFamily: 'monospace',
+        fontWeight: 700,
         cursor: 'pointer',
-        marginTop: '4px',
+        marginTop: 4,
     },
     buttonDisabled: {
-        padding: '11px',
-        backgroundColor: '#888',
-        color: '#fff',
+        padding: '12px',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.4)',
         border: 'none',
-        borderRadius: '4px',
-        fontSize: '14px',
+        fontSize: 10,
+        letterSpacing: '0.25em',
+        fontFamily: 'monospace',
         cursor: 'not-allowed',
-        marginTop: '4px',
+        marginTop: 4,
     },
     footer: {
         textAlign: 'center',
-        marginTop: '20px',
-        fontSize: '13px',
-        color: '#888',
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.28)',
+        fontFamily: 'monospace',
+        letterSpacing: '0.05em',
     },
     link: {
-        color: '#111',
-        fontWeight: '500',
-    }
+        color: 'rgba(255,255,255,0.7)',
+        textDecoration: 'underline',
+        textUnderlineOffset: 3,
+    },
 }
 
 export default Login

@@ -26,3 +26,20 @@ class Like(models.Model):
 
     def __str__(self):
         return f'Like by user {self.user_id} on post {self.post_id}'
+
+
+class Notification(models.Model):
+    recipient_id = models.IntegerField()
+    actor_id = models.IntegerField()
+    actor_username = models.CharField(max_length=50)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=20)
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.message
