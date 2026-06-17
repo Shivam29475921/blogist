@@ -12,6 +12,7 @@ import Footer from "@/components/folio/Footer";
 import NewspaperSpread from "@/components/folio/NewspaperSpread";
 import TickerStrip from "@/components/folio/TickerStrip";
 import PageIndicator from "@/components/folio/PageIndicator";
+import WritingAnalyzer from "@/components/folio/WritingAnalyzer";
 
 export default function LandingPage() {
   const [runKey, setRunKey] = useState(0);
@@ -55,6 +56,7 @@ export default function LandingPage() {
         <div id="how"><HowItWorks /></div>
         <div id="pull"><PullQuote /></div>
         <div id="stack"><TechStack /></div>
+        <div id="analyzer"><WritingAnalyzer /></div>
         <div id="cta"><FinalCTA onSignUp={openSignUp} onSignIn={openSignIn} /></div>
         <Footer />
       </div>

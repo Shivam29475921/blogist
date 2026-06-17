@@ -1,9 +1,11 @@
 import os
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from groq import Groq
+from .analyzer import analyze_writing
+
 
 
 @api_view(['POST'])
@@ -67,3 +69,21 @@ def generate_blog(request):
             {'error': f'AI generation failed: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def analyze_writing_view(request):
+    content = request.data.get('content', '')
+
+    if not content:
+        return Response(
+            {'error': 'Content is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    result = analyze_writing(content)
+
+    if 'error' in result:
+        return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(result, status=status.HTTP_200_OK)

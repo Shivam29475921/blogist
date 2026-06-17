@@ -37,10 +37,10 @@ function Navbar() {
     }
 
     const handleLogout = () => {
-        logout()
-        navigate('/login')
-        setShowLogoutConfirm(false)
-    }
+    logout()
+    navigate('/')
+    setShowLogoutConfirm(false)
+}
 
     return (
         <>

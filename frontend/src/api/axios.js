@@ -53,7 +53,9 @@ export const commentAPI = {
 export const aiAPI = {
     generateBlog: (topic) => axios.post(`${AI_URL}/api/ai/generate-blog/`, { topic }, {
         headers: getAuthHeaders()
+
     }),
+     analyzeWriting: (content) => axios.post(`${AI_URL}/api/ai/analyze-writing/`, { content }),
 }
 
 export const notificationAPI = {

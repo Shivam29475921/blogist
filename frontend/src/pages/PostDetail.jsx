@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
-import { postAPI, commentAPI } from '../api/axios'
+
 import { useAuth } from '../context/AuthContext'
 import BackButton from '../components/BackButton'
+import { postAPI, commentAPI, aiAPI } from '../api/axios'
 
 function PostDetail() {
     const { id } = useParams()
     const navigate = useNavigate()
     const { user } = useAuth()
+    const [analysis, setAnalysis] = useState(null)
+const [analyzing, setAnalyzing] = useState(false)
 
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
@@ -58,6 +61,17 @@ function PostDetail() {
             setCommentLoading(false)
         }
     }
+    const handleAnalyze = async () => {
+    setAnalyzing(true)
+    try {
+        const response = await aiAPI.analyzeWriting(post.content)
+        setAnalysis(response.data)
+    } catch (err) {
+        console.error('Analysis failed')
+    } finally {
+        setAnalyzing(false)
+    }
+}
 
     const confirmDelete = async () => {
         try {
@@ -115,6 +129,114 @@ function PostDetail() {
                         <ReactMarkdown>{post.content}</ReactMarkdown>
                     </div>
                 </div>
+                {/* Writing Analysis */}
+<div style={analysisStyles.section}>
+    {!analysis ? (
+        <button
+            onClick={handleAnalyze}
+            disabled={analyzing}
+            style={analysisStyles.analyzeBtn}
+        >
+            {analyzing ? 'Analyzing...' : '🔬 Analyze writing'}
+        </button>
+    ) : (
+        <div style={analysisStyles.panel}>
+            <div style={analysisStyles.panelHeader}>
+                <h4 style={analysisStyles.panelTitle}>Writing Analysis</h4>
+                <button
+                    onClick={() => setAnalysis(null)}
+                    style={analysisStyles.closeBtn}
+                >
+                    ✕
+                </button>
+            </div>
+
+            {/* Main Score */}
+            <div style={analysisStyles.scoreRow}>
+                <div style={analysisStyles.scoreBlock}>
+                    <span style={analysisStyles.scoreNum}>
+                        {analysis.human_percent}%
+                    </span>
+                    <span style={analysisStyles.scoreLabel}>Human</span>
+                </div>
+                <div style={analysisStyles.scoreDivider} />
+                <div style={analysisStyles.scoreBlock}>
+                    <span style={{
+                        ...analysisStyles.scoreNum,
+                        color: '#888'
+                    }}>
+                        {analysis.ai_percent}%
+                    </span>
+                    <span style={analysisStyles.scoreLabel}>AI Pattern</span>
+                </div>
+                <div style={analysisStyles.verdict}>
+                    <span style={{
+                        ...analysisStyles.verdictBadge,
+                        backgroundColor:
+                            analysis.verdict_color === 'green' ? '#dcfce7' :
+                            analysis.verdict_color === 'yellow' ? '#fef3c7' :
+                            analysis.verdict_color === 'orange' ? '#ffedd5' : '#fee2e2',
+                        color:
+                            analysis.verdict_color === 'green' ? '#166534' :
+                            analysis.verdict_color === 'yellow' ? '#92400e' :
+                            analysis.verdict_color === 'orange' ? '#9a3412' : '#991b1b',
+                    }}>
+                        {analysis.verdict}
+                    </span>
+                </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div style={analysisStyles.barTrack}>
+                <div style={{
+                    ...analysisStyles.barFill,
+                    width: `${analysis.human_percent}%`,
+                }} />
+            </div>
+
+            {/* Metrics */}
+            <div style={analysisStyles.metrics}>
+                {Object.values(analysis.metrics).map(metric => (
+                    <div key={metric.label} style={analysisStyles.metric}>
+                        <div style={analysisStyles.metricHeader}>
+                            <span style={analysisStyles.metricLabel}>
+                                {metric.label}
+                            </span>
+                            <span style={analysisStyles.metricScore}>
+                                {Math.round(metric.score * 100)}%
+                            </span>
+                        </div>
+                        <div style={analysisStyles.metricTrack}>
+                            <div style={{
+                                ...analysisStyles.metricFill,
+                                width: `${metric.score * 100}%`,
+                                backgroundColor: metric.score > 0.6 ? '#4ade80' :
+                                                metric.score > 0.4 ? '#facc15' : '#f87171',
+                            }} />
+                        </div>
+                        <span style={analysisStyles.metricDesc}>
+                            {metric.description}
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Stats */}
+            <div style={analysisStyles.stats}>
+                <span style={analysisStyles.stat}>
+                    {analysis.word_count} words
+                </span>
+                <span style={analysisStyles.stat}>
+                    {analysis.sentence_count} sentences
+                </span>
+            </div>
+
+            <p style={analysisStyles.disclaimer}>
+                Statistical analysis only. Not a definitive AI detector.
+            </p>
+        </div>
+    )}
+</div>
 
                 {/* Comments */}
                 <div style={styles.commentsSection}>
@@ -424,6 +546,165 @@ const styles = {
         fontSize: 12,
         fontFamily: 'monospace',
         letterSpacing: '0.1em',
+    },
+}
+const analysisStyles = {
+    section: {
+        marginTop: '24px',
+        paddingTop: '24px',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+    },
+    analyzeBtn: {
+        background: 'none',
+        border: '1px solid rgba(255,255,255,0.12)',
+        borderRadius: '4px',
+        padding: '8px 16px',
+        fontSize: '12px',
+        color: 'rgba(255,255,255,0.4)',
+        cursor: 'pointer',
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
+    },
+    panel: {
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '4px',
+        padding: '20px',
+    },
+    panelHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '16px',
+    },
+    panelTitle: {
+        fontSize: '12px',
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.5)',
+        margin: 0,
+        fontFamily: 'monospace',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+    },
+    closeBtn: {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        color: 'rgba(255,255,255,0.2)',
+        fontSize: '14px',
+        padding: '0',
+    },
+    scoreRow: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '20px',
+        marginBottom: '16px',
+        flexWrap: 'wrap',
+    },
+    scoreBlock: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '2px',
+    },
+    scoreNum: {
+        fontSize: '28px',
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.88)',
+        fontFamily: 'Lora, serif',
+    },
+    scoreLabel: {
+        fontSize: '10px',
+        color: 'rgba(255,255,255,0.25)',
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em',
+    },
+    scoreDivider: {
+        width: '1px',
+        height: '40px',
+        backgroundColor: 'rgba(255,255,255,0.08)',
+    },
+    verdict: {
+        marginLeft: 'auto',
+    },
+    verdictBadge: {
+        fontSize: '11px',
+        fontWeight: '600',
+        padding: '4px 12px',
+        borderRadius: '20px',
+        fontFamily: 'monospace',
+        letterSpacing: '0.05em',
+    },
+    barTrack: {
+        height: '3px',
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: '2px',
+        marginBottom: '20px',
+        overflow: 'hidden',
+    },
+    barFill: {
+        height: '100%',
+        backgroundColor: '#4ade80',
+        borderRadius: '2px',
+        transition: 'width 0.8s ease',
+    },
+    metrics: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        marginBottom: '16px',
+    },
+    metric: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+    },
+    metricHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    metricLabel: {
+        fontSize: '12px',
+        fontWeight: '500',
+        color: 'rgba(255,255,255,0.45)',
+    },
+    metricScore: {
+        fontSize: '12px',
+        color: 'rgba(255,255,255,0.25)',
+    },
+    metricTrack: {
+        height: '3px',
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: '2px',
+        overflow: 'hidden',
+    },
+    metricFill: {
+        height: '100%',
+        borderRadius: '2px',
+        transition: 'width 0.6s ease',
+    },
+    metricDesc: {
+        fontSize: '11px',
+        color: 'rgba(255,255,255,0.2)',
+    },
+    stats: {
+        display: 'flex',
+        gap: '16px',
+        paddingTop: '12px',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        marginBottom: '8px',
+    },
+    stat: {
+        fontSize: '11px',
+        color: 'rgba(255,255,255,0.25)',
+        fontFamily: 'monospace',
+    },
+    disclaimer: {
+        fontSize: '11px',
+        color: 'rgba(255,255,255,0.15)',
+        margin: 0,
+        fontStyle: 'italic',
     },
 }
 
