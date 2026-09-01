@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 
-const AI_URL = "http://localhost:8004";
+const AI_URL = "";
 
 const SAMPLE_TEXT = `I've been thinking about this for a while, and honestly, I don't think most people realize how much the way we consume information has changed. Back in 2015, if you wanted to know something, you'd read three different articles and form your own take. Now? You prompt a machine, skim the output, and hit publish. I'm guilty of it too. The thing is — the facts might be right. But the thought never happened. And that gap between information and thought is where everything interesting used to live.`;
 

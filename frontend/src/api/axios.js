@@ -1,9 +1,9 @@
 import axios from 'axios'
 
-const AUTH_URL = 'http://localhost:8001'
-const POST_URL = 'http://localhost:8002'
-const COMMENT_URL = 'http://localhost:8003'
-const AI_URL = 'http://localhost:8004'
+const AUTH_URL = ''
+const POST_URL = ''
+const COMMENT_URL = ''
+const AI_URL = ''
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('access_token') || localStorage.getItem('token')
