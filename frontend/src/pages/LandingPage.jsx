@@ -1,18 +1,18 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import IntroAnimation from "@/components/folio/IntroAnimation";
-import Nav from "@/components/folio/Nav";
-import Hero from "@/components/folio/Hero";
-import Manifesto from "@/components/folio/Manifesto";
-import HowItWorks from "@/components/folio/HowItWorks";
-import PullQuote from "@/components/folio/PullQuote";
-import TechStack from "@/components/folio/TechStack";
-import FinalCTA from "@/components/folio/FinalCTA";
-import Footer from "@/components/folio/Footer";
-import NewspaperSpread from "@/components/folio/NewspaperSpread";
-import TickerStrip from "@/components/folio/TickerStrip";
-import PageIndicator from "@/components/folio/PageIndicator";
-import WritingAnalyzer from "@/components/folio/WritingAnalyzer";
+import IntroAnimation from "@/components/blogist/IntroAnimation";
+import Nav from "@/components/blogist/Nav";
+import Hero from "@/components/blogist/Hero";
+import Manifesto from "@/components/blogist/Manifesto";
+import HowItWorks from "@/components/blogist/HowItWorks";
+import PullQuote from "@/components/blogist/PullQuote";
+import TechStack from "@/components/blogist/TechStack";
+import FinalCTA from "@/components/blogist/FinalCTA";
+import Footer from "@/components/blogist/Footer";
+import NewspaperSpread from "@/components/blogist/NewspaperSpread";
+import TickerStrip from "@/components/blogist/TickerStrip";
+import PageIndicator from "@/components/blogist/PageIndicator";
+import WritingAnalyzer from "@/components/blogist/WritingAnalyzer";
 
 export default function LandingPage() {
   const [runKey, setRunKey] = useState(0);
@@ -22,7 +22,7 @@ export default function LandingPage() {
   const openSignIn = () => navigate("/login");
 
   return (
-    <div data-testid="folio-app" style={{ background: "#080808", position: "relative" }}>
+    <div data-testid="blogist-app" style={{ background: "#080808", position: "relative" }}>
       {/* Ambient depth */}
       <div aria-hidden style={{ pointerEvents: "none", position: "absolute", inset: 0, background: "radial-gradient(60% 35% at 18% 12%, rgba(245,240,232,0.045) 0%, rgba(0,0,0,0) 60%),radial-gradient(50% 40% at 92% 42%, rgba(245,240,232,0.04) 0%, rgba(0,0,0,0) 65%),radial-gradient(70% 40% at 22% 78%, rgba(245,240,232,0.035) 0%, rgba(0,0,0,0) 60%)", zIndex: 0 }} />
       {/* Film grain */}

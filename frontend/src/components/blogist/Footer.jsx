@@ -8,7 +8,7 @@ export const Footer = () => {
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
         <div className="font-display" style={{ fontSize: 20, color: "rgba(255,255,255,0.9)", letterSpacing: "-0.01em" }}>
-          Folio<span style={{ color: "rgba(255,255,255,0.3)" }}> · the observer</span>
+          Blogist<span style={{ color: "rgba(255,255,255,0.3)" }}> · the observer</span>
         </div>
         <div className="font-mono" style={{ fontSize: 10, letterSpacing: "0.25em", color: "rgba(255,255,255,0.28)" }}>
           BUILT BY NISHA PARASHAR · MMXXVI

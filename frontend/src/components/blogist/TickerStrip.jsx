@@ -9,7 +9,7 @@ export const TickerStrip = () => {
     "YOUR WORDS · YOUR VOICE",
     "ISSUE №0001",
     "TRANSMITTED LIVE FROM THE DESK",
-    "FOLIO · THE OBSERVER",
+    "BLOGIST · THE OBSERVER",
     "READ LONGER · POST LESS",
     "THE SENTENCE IS THE PRODUCT",
   ];

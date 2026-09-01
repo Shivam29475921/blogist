@@ -6,12 +6,12 @@ export const NewspaperSpread = () => {
     <section
       data-testid="spread-section"
       className="paper-texture grain"
-      style={{ position: "relative", color: "var(--folio-ink)", padding: "0", marginTop: 40, marginBottom: 40, boxShadow: "0 60px 120px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(40,28,16,0.08)" }}
+      style={{ position: "relative", color: "var(--blogist-ink)", padding: "0", marginTop: 40, marginBottom: 40, boxShadow: "0 60px 120px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(40,28,16,0.08)" }}
     >
       {/* Torn top edge */}
-      <div aria-hidden style={{ position: "absolute", left: 0, right: 0, top: -10, height: 14, background: "var(--folio-paper)", clipPath: "polygon(0 100%, 1.5% 60%, 3% 92%, 5% 55%, 7% 90%, 10% 50%, 13% 95%, 16% 60%, 19% 88%, 22% 52%, 25% 92%, 28% 58%, 31% 90%, 34% 54%, 37% 92%, 40% 60%, 43% 88%, 46% 50%, 49% 92%, 52% 56%, 55% 88%, 58% 60%, 61% 92%, 64% 54%, 67% 90%, 70% 58%, 73% 92%, 76% 50%, 79% 90%, 82% 60%, 85% 88%, 88% 54%, 91% 92%, 94% 58%, 97% 90%, 100% 56%, 100% 100%, 0 100%)" }} />
+      <div aria-hidden style={{ position: "absolute", left: 0, right: 0, top: -10, height: 14, background: "var(--blogist-paper)", clipPath: "polygon(0 100%, 1.5% 60%, 3% 92%, 5% 55%, 7% 90%, 10% 50%, 13% 95%, 16% 60%, 19% 88%, 22% 52%, 25% 92%, 28% 58%, 31% 90%, 34% 54%, 37% 92%, 40% 60%, 43% 88%, 46% 50%, 49% 92%, 52% 56%, 55% 88%, 58% 60%, 61% 92%, 64% 54%, 67% 90%, 70% 58%, 73% 92%, 76% 50%, 79% 90%, 82% 60%, 85% 88%, 88% 54%, 91% 92%, 94% 58%, 97% 90%, 100% 56%, 100% 100%, 0 100%)" }} />
       {/* Torn bottom edge */}
-      <div aria-hidden style={{ position: "absolute", left: 0, right: 0, bottom: -10, height: 14, background: "var(--folio-paper)", clipPath: "polygon(0 0, 1.5% 40%, 3% 8%, 5% 45%, 7% 10%, 10% 50%, 13% 5%, 16% 40%, 19% 12%, 22% 48%, 25% 8%, 28% 42%, 31% 10%, 34% 46%, 37% 8%, 40% 40%, 43% 12%, 46% 50%, 49% 8%, 52% 44%, 55% 12%, 58% 40%, 61% 8%, 64% 46%, 67% 10%, 70% 42%, 73% 8%, 76% 50%, 79% 10%, 82% 40%, 85% 12%, 88% 46%, 91% 8%, 94% 42%, 97% 10%, 100% 44%, 100% 0, 0 0)" }} />
+      <div aria-hidden style={{ position: "absolute", left: 0, right: 0, bottom: -10, height: 14, background: "var(--blogist-paper)", clipPath: "polygon(0 0, 1.5% 40%, 3% 8%, 5% 45%, 7% 10%, 10% 50%, 13% 5%, 16% 40%, 19% 12%, 22% 48%, 25% 8%, 28% 42%, 31% 10%, 34% 46%, 37% 8%, 40% 40%, 43% 12%, 46% 50%, 49% 8%, 52% 44%, 55% 12%, 58% 40%, 61% 8%, 64% 46%, 67% 10%, 70% 42%, 73% 8%, 76% 50%, 79% 10%, 82% 40%, 85% 12%, 88% 46%, 91% 8%, 94% 42%, 97% 10%, 100% 44%, 100% 0, 0 0)" }} />
 
       <div style={{ padding: "120px 6vw 110px" }}>
         {/* Masthead */}
@@ -26,7 +26,7 @@ export const NewspaperSpread = () => {
           className="font-news"
           style={{ textAlign: "center", fontSize: "clamp(72px, 9vw, 168px)", lineHeight: 0.92, letterSpacing: "0.005em", fontWeight: 900, margin: "44px 0 8px" }}
         >
-          THE FOLIO OBSERVER
+          THE BLOGIST OBSERVER
         </motion.h2>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, borderTop: "1px solid rgba(26,22,18,0.5)", borderBottom: "1px solid rgba(26,22,18,0.5)", padding: "8px 0" }}>
@@ -58,7 +58,7 @@ export const NewspaperSpread = () => {
               <span className="font-news" style={{ fontSize: 56, lineHeight: 0.85, float: "left", marginRight: 10, marginTop: 6, fontWeight: 800 }}>W</span>
               e built a place for people who still want to write the sentence. Not approve it. Not regenerate it. Not nudge it forward with the tab key. Write it.
             </p>
-            <p style={{ marginBottom: 16 }}>Folio does not offer a button that finishes your thought. We think your thought is the entire point. The model can fetch you facts, dates, sources, counterexamples. It cannot fetch you the way you feel about them.</p>
+            <p style={{ marginBottom: 16 }}>Blogist does not offer a button that finishes your thought. We think your thought is the entire point. The model can fetch you facts, dates, sources, counterexamples. It cannot fetch you the way you feel about them.</p>
             <p>That part is yours. It always was. We just kept the door open.</p>
           </motion.div>
 

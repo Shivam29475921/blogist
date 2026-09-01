@@ -53,7 +53,7 @@ export default function WritingAnalyzer() {
         </h2>
 
         <p style={s.subtitle}>
-          Folio's writing analyzer measures burstiness, vocabulary diversity,
+          Blogist's writing analyzer measures burstiness, vocabulary diversity,
           hedge phrases, and personal voice markers — the statistical fingerprints
           that separate human thought from AI output. Paste anything below.
         </p>

@@ -151,7 +151,7 @@ const ScrollPaperRoll = ({ sectionRef }) => {
       <div style={{ position: "absolute", left: 0, right: 0, top: -6, height: 8, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(60,40,20,0.18) 100%)", clipPath: "polygon(0 100%, 2% 60%, 5% 90%, 8% 50%, 12% 88%, 16% 55%, 20% 92%, 24% 60%, 28% 86%, 32% 52%, 36% 90%, 40% 58%, 44% 88%, 48% 50%, 52% 92%, 56% 56%, 60% 86%, 64% 60%, 68% 88%, 72% 54%, 76% 90%, 80% 58%, 84% 86%, 88% 52%, 92% 88%, 96% 56%, 100% 90%, 100% 100%, 0 100%)" }} />
 
       <motion.div
-        className="folio-paper paper-texture grain"
+        className="blogist-paper paper-texture grain"
         style={{
           width: "100%",
           height: "100%",
@@ -167,7 +167,7 @@ const ScrollPaperRoll = ({ sectionRef }) => {
           {Array.from({ length: 2 }).map((_, k) => (
             <div key={k} className="font-news" style={{ display: "flex", alignItems: "center", fontSize: 64, fontWeight: 800, letterSpacing: "0.02em", paddingRight: 48 }}>
               <span style={{ marginRight: 36 }}>✦</span>
-              <span style={{ marginRight: 36 }}>FOLIO</span>
+              <span style={{ marginRight: 36 }}>BLOGIST</span>
               <span style={{ marginRight: 36 }}>✦</span>
               <span style={{ marginRight: 36 }}>YOUR WORDS</span>
               <span style={{ marginRight: 36 }}>✦</span>

@@ -60,7 +60,7 @@ export const AuthDialog = ({ open, mode = "signup", onClose, onSwitchMode }) => 
                 marginBottom: 28,
               }}
             >
-              — {isSignup ? "JOIN THE FOLIO" : "RETURN TO THE FOLIO"}
+              — {isSignup ? "JOIN BLOGIST" : "RETURN TO BLOGIST"}
             </div>
 
             <h3

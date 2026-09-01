@@ -69,9 +69,9 @@ function Posts() {
 
             {/* Hero */}
             <div style={styles.hero}>
-                <p style={styles.heroKicker}>THE FOLIO OBSERVER</p>
+                <p style={styles.heroKicker}>THE BLOGIST OBSERVER</p>
                 <h1 style={styles.heroTitle}>Ideas worth reading</h1>
-                <p style={styles.heroSub}>Thoughtful writing from the Folio community</p>
+                <p style={styles.heroSub}>Thoughtful writing from the Blogist community</p>
                 {user && (
                     <Link to="/posts/create" style={styles.heroBtn}>
                         Start writing →
@@ -85,7 +85,7 @@ function Posts() {
                     {posts.length === 0 ? (
                         <div style={styles.empty}>
                             <p style={styles.emptyTitle}>Nothing here yet</p>
-                            <p style={styles.emptySub}>Be the first to publish on Folio</p>
+                            <p style={styles.emptySub}>Be the first to publish on Blogist</p>
                             {user && (
                                 <Link to="/posts/create" style={styles.heroBtn}>
                                     Write the first post
@@ -157,7 +157,7 @@ function Posts() {
                 {/* Sidebar */}
                 <aside style={styles.sidebar}>
                     <div style={styles.sideCard}>
-                        <h3 style={styles.sideTitle}>About Folio</h3>
+                        <h3 style={styles.sideTitle}>About Blogist</h3>
                         <p style={styles.sideText}>
                             A platform for developers and thinkers to share ideas.
                             Built with Django microservices, React, and deployed on AWS.
@@ -165,7 +165,7 @@ function Posts() {
                         {user ? (
                             <Link to="/posts/create" style={styles.sideBtn}>Write a post →</Link>
                         ) : (
-                            <Link to="/register" style={styles.sideBtn}>Join Folio →</Link>
+                            <Link to="/register" style={styles.sideBtn}>Join Blogist →</Link>
                         )}
                     </div>
 

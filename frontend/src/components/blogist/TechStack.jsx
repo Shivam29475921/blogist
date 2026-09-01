@@ -87,8 +87,8 @@ export const TechStack = () => {
                 <span style={{ width: 9, height: 9, borderRadius: 999, background: "rgba(255,255,255,0.32)", display: "inline-block" }} />
                 <span style={{ width: 9, height: 9, borderRadius: 999, background: "rgba(255,255,255,0.55)", display: "inline-block" }} />
               </div>
-              <span style={{ fontSize: 10, letterSpacing: "0.25em", color: "rgba(255,255,255,0.38)" }}>folio · docker compose · up</span>
-              <span style={{ fontSize: 10, letterSpacing: "0.2em", color: "rgba(255,255,255,0.28)" }}>~/folio</span>
+              <span style={{ fontSize: 10, letterSpacing: "0.25em", color: "rgba(255,255,255,0.38)" }}>blogist · docker compose · up</span>
+              <span style={{ fontSize: 10, letterSpacing: "0.2em", color: "rgba(255,255,255,0.28)" }}>~/blogist</span>
             </div>
 
             <div style={{ color: "rgba(255,255,255,0.45)" }}>
@@ -101,7 +101,7 @@ export const TechStack = () => {
               return (
                 <div key={srv.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", opacity: visible ? 1 : 0.15, transition: "opacity 0.5s ease" }}>
                   <span style={{ color: "rgba(255,255,255,0.55)" }}>
-                    <span style={{ color: "rgba(255,255,255,0.85)" }}>folio_{srv.name}</span>
+                    <span style={{ color: "rgba(255,255,255,0.85)" }}>blogist_{srv.name}</span>
                     <span style={{ color: "rgba(255,255,255,0.4)" }}> ::{srv.port} </span>
                     <span style={{ color: "rgba(255,255,255,0.4)" }}>────────</span>
                   </span>
@@ -114,7 +114,7 @@ export const TechStack = () => {
 
             <div style={{ height: 16 }} />
             <div style={{ color: "rgba(255,255,255,0.45)" }}>
-              <span style={{ color: "rgba(255,255,255,0.85)" }}>$</span> folio --status
+              <span style={{ color: "rgba(255,255,255,0.85)" }}>$</span> blogist --status
             </div>
             <div style={{ color: "rgba(255,255,255,0.55)" }}>
               all services healthy. queue: 0. authors online:{" "}

@@ -6,7 +6,7 @@ export const Newspaper = ({ headline, kicker, date = "VOL. I · NO. 01" }) => {
   return (
     <div
       data-testid="newspaper-page"
-      className="folio-paper paper-texture grain shadow-2xl"
+      className="blogist-paper paper-texture grain shadow-2xl"
       style={{
         width: 360,
         height: 460,
@@ -40,7 +40,7 @@ export const Newspaper = ({ headline, kicker, date = "VOL. I · NO. 01" }) => {
           fontWeight: 900,
         }}
       >
-        THE FOLIO OBSERVER
+        THE BLOGIST OBSERVER
       </h1>
 
       <div className="flex items-center justify-center gap-3 border-b border-t border-[#1a1612]/40 py-1">
@@ -126,7 +126,7 @@ export const Newspaper = ({ headline, kicker, date = "VOL. I · NO. 01" }) => {
           className="font-mono italic"
           style={{ fontSize: 7.5, letterSpacing: "0.18em", opacity: 0.65 }}
         >
-          folio · observer
+          blogist · observer
         </span>
       </div>
     </div>

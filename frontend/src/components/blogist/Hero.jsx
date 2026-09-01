@@ -54,7 +54,7 @@ export const Hero = ({ onSignUp, onSignIn }) => {
         className="font-body"
         style={{ marginTop: 56, maxWidth: 560, fontSize: 18, lineHeight: 1.55, color: "rgba(255,255,255,0.7)" }}
       >
-        Folio is where you take it back. Informed by AI, written by you.
+        Blogist is where you take it back. Informed by AI, written by you.
       </motion.p>
 
       <motion.div
@@ -88,7 +88,7 @@ export const Hero = ({ onSignUp, onSignIn }) => {
         className="font-mono"
         style={{ position: "absolute", bottom: 36, left: "8vw", fontSize: 10, letterSpacing: "0.3em", color: "rgba(255,255,255,0.28)" }}
       >
-        FOLIO / VOL.I — EST. MMXXVI
+        BLOGIST / VOL.I — EST. MMXXVI
       </motion.div>
       <motion.div
         initial={{ opacity: 0 }}

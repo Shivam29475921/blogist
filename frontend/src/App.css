@@ -182,5 +182,5 @@
     border-right-color: var(--border);
   }
 }
-/* === Folio Landing === */
-.folio-landing-root { background: #080808; min-height: 100vh; }
+/* === Blogist Landing === */
+.blogist-landing-root { background: #080808; min-height: 100vh; }

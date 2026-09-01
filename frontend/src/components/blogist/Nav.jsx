@@ -24,7 +24,7 @@ export const Nav = ({ onSignIn, onSignUp, onReplay }) => {
           className="font-display"
           style={{ fontSize: 22, color: "#fff", letterSpacing: "-0.01em", fontWeight: 600 }}
         >
-          Folio
+          Blogist
         </span>
         <span
           className="font-mono"

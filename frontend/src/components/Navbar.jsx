@@ -48,7 +48,7 @@ function Navbar() {
                 <div style={styles.inner}>
                     <div style={styles.left}>
                         <Link to="/posts" style={styles.brand}>
-                            Folio
+                            Blogist
                         </Link>
                     </div>
 

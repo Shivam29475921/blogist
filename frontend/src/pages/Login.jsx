@@ -35,7 +35,7 @@ function Login() {
             <div style={styles.card}>
                 <Link to="/" style={{ textDecoration: 'none' }}>
                     <div style={styles.masthead}>
-                        <span style={styles.mastheadTitle}>Folio</span>
+                        <span style={styles.mastheadTitle}>Blogist</span>
                         <span style={styles.mastheadSub}> · the observer</span>
                     </div>
                 </Link>

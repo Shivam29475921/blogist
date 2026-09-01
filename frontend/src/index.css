@@ -29,26 +29,26 @@ a {
     color: #080808;
 }
 
-/* === Folio Landing CSS Variables === */
+/* === Blogist Landing CSS Variables === */
 :root {
-    --folio-bg: #080808;
-    --folio-paper: #f5f0e8;
-    --folio-ink: #1a1612;
+    --blogist-bg: #080808;
+    --blogist-paper: #f5f0e8;
+    --blogist-ink: #1a1612;
     --background: 0 0% 3%;
     --foreground: 0 0% 98%;
     --radius: 0.5rem;
 }
 
-/* === Folio Font Classes === */
+/* === Blogist Font Classes === */
 .font-display { font-family: "Lora", Georgia, serif; font-feature-settings: "lnum" 1, "kern" 1; }
 .font-news { font-family: "Playfair Display", "Lora", Georgia, serif; }
 .font-mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
 .font-body { font-family: "DM Sans", sans-serif; }
 
-/* === Folio Paper Styles === */
-.folio-paper { background: var(--folio-paper); color: var(--folio-ink); font-family: Georgia, "Times New Roman", serif; }
+/* === Blogist Paper Styles === */
+.blogist-paper { background: var(--blogist-paper); color: var(--blogist-ink); font-family: Georgia, "Times New Roman", serif; }
 .paper-texture {
-    background-color: var(--folio-paper);
+    background-color: var(--blogist-paper);
     background-image:
         radial-gradient(circle at 20% 30%, rgba(120,90,60,0.06) 0, transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(120,90,60,0.05) 0, transparent 40%),
@@ -65,7 +65,7 @@ a {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* === Folio Animations === */
+/* === Blogist Animations === */
 @keyframes marquee {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
@@ -78,7 +78,7 @@ a {
 }
 .cursor-blink { animation: blink 1.05s steps(1) infinite; }
 
-/* === Folio UI Classes === */
+/* === Blogist UI Classes === */
 .pill-cta {
     transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1), background-color 0.3s ease, color 0.3s ease, letter-spacing 0.4s ease;
 }
