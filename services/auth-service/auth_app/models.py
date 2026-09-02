@@ -65,3 +65,23 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.message
+
+
+class EmailOTP(models.Model):
+    email = models.EmailField(db_index=True)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now=True)
+    is_verified = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Email OTP'
+        verbose_name_plural = 'Email OTPs'
+        ordering = ['-created_at']
+
+    def is_valid(self):
+        from django.utils import timezone
+        # Valid for 10 minutes (600 seconds)
+        return (timezone.now() - self.created_at).total_seconds() < 600
+
+    def __str__(self):
+        return f'{self.email} - {self.otp}'

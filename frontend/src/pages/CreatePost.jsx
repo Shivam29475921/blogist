@@ -64,7 +64,7 @@ function CreatePost() {
             const status = err.response?.status
             if (status === 401) setError('Log in before generating AI content.')
             else if (!err.response) setError('AI service not reachable.')
-            else setError('AI generation failed. Try again.')
+            else setError(err.response?.data?.error || 'AI generation failed. Try again.')
         } finally {
             setAiLoading(false)
         }

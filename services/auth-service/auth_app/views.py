@@ -3,19 +3,103 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
-from .models import User, Follow, Notification
+from .models import User, Follow, Notification, EmailOTP
+from .utils import generate_otp, send_otp_email
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
+def send_otp(request):
+    email = request.data.get('email', '').lower().strip()
+    username = request.data.get('username', '').strip()
+
+    if not email:
+        return Response({'error': 'Email address is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        validate_email(email)
+    except ValidationError:
+        return Response({'error': 'Please provide a valid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if User.objects.filter(email__iexact=email).exists():
+        return Response({'error': 'An account with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if username and User.objects.filter(username__iexact=username).exists():
+        return Response({'error': 'Username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Rate limiting / cooldown: 30s between OTP requests for the same email
+    existing_otp = EmailOTP.objects.filter(email=email).order_by('-created_at').first()
+    if existing_otp and (timezone.now() - existing_otp.created_at).total_seconds() < 30:
+        remaining = int(30 - (timezone.now() - existing_otp.created_at).total_seconds())
+        return Response(
+            {'error': f'Please wait {remaining} seconds before requesting a new code.'},
+            status=status.HTTP_429_TOO_MANY_REQUESTS
+        )
+
+    otp = generate_otp()
+    EmailOTP.objects.update_or_create(
+        email=email,
+        defaults={'otp': otp, 'created_at': timezone.now(), 'is_verified': False}
+    )
+
+    send_otp_email(email, otp, async_send=True)
+
+    from django.conf import settings
+    response_data = {
+        'message': f'Verification code sent to {email}.',
+    }
+    if settings.DEBUG:
+        response_data['debug_otp'] = otp
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_otp(request):
+    email = request.data.get('email', '').lower().strip()
+    otp = request.data.get('otp', '').strip()
+
+    if not email or not otp:
+        return Response({'error': 'Email and verification code are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        otp_record = EmailOTP.objects.filter(email=email).latest('created_at')
+    except EmailOTP.DoesNotExist:
+        return Response({'error': 'No verification code found for this email.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not otp_record.is_valid():
+        return Response({'error': 'Verification code has expired. Please request a new code.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if otp_record.otp != otp:
+        return Response({'error': 'Invalid verification code.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    otp_record.is_verified = True
+    otp_record.save()
+
+    return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        refresh['username'] = user.username
         return Response(
             {
                 'message': 'User registered successfully',
-                'user': UserSerializer(user).data
+                'user': UserSerializer(user).data,
+                'tokens': {
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                }
             },
             status=status.HTTP_201_CREATED
         )

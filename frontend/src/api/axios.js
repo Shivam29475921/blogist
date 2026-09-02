@@ -11,6 +11,8 @@ const getAuthHeaders = () => {
 }
 
 export const authAPI = {
+    sendOTP: (data) => axios.post(`${AUTH_URL}/api/auth/send-otp/`, data),
+    verifyOTP: (data) => axios.post(`${AUTH_URL}/api/auth/verify-otp/`, data),
     register: (data) => axios.post(`${AUTH_URL}/api/auth/register/`, data),
     login: (data) => axios.post(`${AUTH_URL}/api/auth/login/`, data),
     profile: () => axios.get(`${AUTH_URL}/api/auth/profile/`, {

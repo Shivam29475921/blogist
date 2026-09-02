@@ -144,3 +144,17 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+# Email configuration
+_email_host_user = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_BACKEND = (
+    os.getenv('EMAIL_BACKEND', '') or
+    ('django.core.mail.backends.smtp.EmailBackend' if _email_host_user else 'django.core.mail.backends.console.EmailBackend')
+)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Blogist <noreply@blogist.io>')
+EMAIL_TIMEOUT = 5

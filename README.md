@@ -6,7 +6,7 @@ A cloud-native blog platform built with Django microservices, React, Docker, Kub
 - **auth-service** — Register, login, JWT auth
 - **post-service** — Create, read, delete posts
 - **comment-service** — Add and fetch comments
-- **ai-service** — AI blog draft generation (Groq)
+- **ai-service** — AI blog draft generation (LangChain + Groq)
 
 ## Tech Stack
 - Backend: Python, Django, Django REST Framework
@@ -15,4 +15,4 @@ A cloud-native blog platform built with Django microservices, React, Docker, Kub
 - Containerization: Docker + Docker Compose
 - Orchestration: Kubernetes (Minikube → AWS EKS)
 - Cloud: AWS (ECR, EKS, RDS, Route53)
-- AI: Groq API (Llama 3.3 70B)
+- AI & LLM: LangChain, Groq API (Llama 3.3 70B)

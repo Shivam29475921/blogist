@@ -3,7 +3,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from groq import Groq
+from langchain_groq import ChatGroq
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 from .analyzer import analyze_writing
 
 
@@ -34,31 +36,37 @@ def generate_blog(request):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        client = Groq(api_key=api_key)
+        model_name = os.getenv('GROQ_MODEL', 'openai/gpt-oss-120b')
 
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a professional blog writer. Write detailed, engaging, and well-structured blog posts. Include an introduction, main sections with headings, and a conclusion."
-                },
-                {
-                    "role": "user",
-                    "content": f"Write a detailed blog post about: {topic}"
-                }
-            ],
-            max_tokens=1024,
+        llm = ChatGroq(
+            groq_api_key=api_key,
+            model_name=model_name,
             temperature=0.7,
+            max_tokens=2048,
         )
 
-        generated_content = completion.choices[0].message.content
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                "You are an expert research assistant for writers and journalists. "
+                "Provide detailed, factual, and well-organized research notes on the requested topic. "
+                "Structure your response with clear markdown headings, key historical context, critical facts, "
+                "notable arguments or perspectives, and essential takeaways that a writer can reference."
+            ),
+            (
+                "human",
+                "Research the following topic thoroughly: {topic}"
+            )
+        ])
+
+        chain = prompt | llm | StrOutputParser()
+        generated_content = chain.invoke({"topic": topic})
 
         return Response(
             {
                 'topic': topic,
                 'content': generated_content,
-                'model': 'llama-3.3-70b-versatile',
+                'model': model_name,
                 'generated_by': request.user.username
             },
             status=status.HTTP_200_OK
